@@ -27,28 +27,28 @@
 #' @importFrom stats coef quantile vcov pchisq pnorm na.exclude prcomp
 #' @importFrom progress progress_bar
 #' @export
-#' @description 
+#' @description
 #' Estimates a panel vector autoregressive (PVAR) model with fixed effects.
 #' @return A \code{pvargmm} object containing the estimation results.
 #' @details
 #' The first vector autoregressive panel model (PVAR) was introduced by Holtz-Eakin et al. (1988). Binder et al. (2005) extend their equation-by-equation estimator for a PVAR model with only endogenous variables that are lagged by one period. We further improve this model in Sigmund and Ferstl (2017) to allow for \eqn{p} lags of \eqn{m} endogenous variables, \eqn{k} predetermined variables and \eqn{n} strictly exogenous variables.
-#' 
+#'
 #' Therefore, we consider the following stationary PVAR with fixed effects.
-#' 
+#'
 #' 	\ifelse{html}{\out{<center><b>y</b><sub><i>i,t</i></sub> = <b>&mu;</b><sub><i>i</i></sub> + &sum;<sub><i>l=1</i></sub><sup>p</sup><b>A</b><sub><i>l</i></sub><b>y</b><sub><i>i,t-l</i></sub> + <b>B</b><b>x</b><sub><i>i,t</i></sub> + <b>C</b><b>s</b><sub><i>i,t</i></sub> + <b>&epsilon;</b><sub><i>i,t</i></sub></center>}}{\deqn{\mathbf{y}_{i,t} = \mathbf{\mu}_i + \sum_{l = 1}^{p}\mathbf{A}_l\mathbf{y}_{i,t-l} + \mathbf{B}\mathbf{x}_{i, t} + \mathbf{C}\mathbf{s}_{i,t} + \mathbf{\epsilon}_{i,t}}}
 #'
 #'
 #' \ifelse{html}{\out{Let <b>y</b><sub><i>i,t</i></sub> &isin; &real;<sup><i>m</i></sup> be an <i>m&times;1</i> vector of <b>endogenous variables</b> for the <i>i</i>th cross-sectional unit at time <i>t</i>. Let <b>y</b><sub><i>i,t-l</i></sub> &isin; &real;<sup><i>m</i></sup> be an <i>m&times;1</i> vector of <b>lagged endogenous variables</b>. Let <b>x</b><sub><i>i,t</i></sub> &isin; &real;<sup><i>k</i></sup> be an <i>k&times;1</i> vector of <b>predetermined variables</b> that are potentially correlated with past errors. Let <b>s</b><sub><i>i,t</i></sub> &isin; &real;<sup><i>n</i></sup> be an <i>n&times;1</i> vector of <b>strictly exogenous variables</b> that neither depend on <b>&epsilon;</b><sub><i>i,t</i></sub> nor on <b>&epsilon;</b><sub><i>i,t-s</i></sub> for <i>s = 1,&hellip;,T</i>. The idiosyncratic error vector <b>&epsilon;</b><sub><i>i,t</i></sub> &isin; &real;<sup><i>m</i></sup> is assumed to be well-behaved and independent from both the regressors <b>x</b><sub><i>i,t</i></sub>  and <b>s</b><sub><i>i,t</i></sub> and the individual error component <b>&mu;</b><sub><i>i</i></sub>. Stationarity requires that all unit roots of the PVAR model fall inside the unit circle, which therefore places some constraints on the <b>fixed effect</b> <b>&mu;</b><sub><i>i</i></sub>. The cross section <i>i</i> and the time section <i>t</i>  are defined as follows: <i>i = 1,&hellip;,N</i> and <i>t = 1,&hellip;T</i>. In this specification we assume parameter homogeneity for <b>A</b><sub><i>l</i></sub> <i>(m&times;m)</i>, <b>B</b> <i>(m&times;k)</i> and <b>C</b> <i>(m&times;n)</i> for all <i>i</i>.}}{\eqn{\mathbf{I}_m} denotes an \eqn{m\times m} identity matrix. Let \eqn{\mathbf{y}_{i,t} \in \R^m} be an \eqn{m\times 1} vector of endogenous variables for the \eqn{i}th cross-sectional unit at time \eqn{t}. Let \eqn{\mathbf{y}_{i,t-l} \in \R^m} be an \eqn{m\times 1} vector of lagged endogenous variables. Let \eqn{\mathbf{x}_{i,t} \in \R^k} be an \eqn{k \times 1} vector of predetermined variables that are potentially correlated with past errors. Let \eqn{\mathbf{s}_{i,t} \in \R^n} be an \eqn{n \times 1} vector of strictly exogenous variables that neither depend on \eqn{\epsilon_t} nor on \eqn{\epsilon_{t-s}} for \eqn{s = 1,\dots,T}. The idiosyncratic error vector \eqn{\mathbf{\epsilon}_{i,t} \in \R^m} is assumed to be well-behaved and independent from both the regressors \eqn{\mathbf{x}_{i,t}} and \eqn{\mathbf{s}_{i,t}} and the individual error component \eqn{\mathbf{\mu}_i}. Stationarity requires that all unit roots of the PVAR model fall inside the unit circle, which therefore places some constraints on the fixed effect \eqn{\mathbf{\mu}_i}. The cross section \eqn{i} and the time section \eqn{t} are defined as follows: \eqn{i = 1,2,...,N} and \eqn{t = 1,2,...,T}. In this specification we assume parameter homogeneity for \eqn{\mathbf{A}_l (m\times m)}, \eqn{\mathbf{B} (m \times k)} and \eqn{\mathbf{C} (m\times n)} for all \eqn{i}.}
-#' 
+#'
 #' A PVAR model is hence a combination of a single equation dynamic panel model (DPM) and a vector autoregressive model (VAR).
-#' 
-#' 
+#'
+#'
 #' First difference and system GMM estimators for single equation dynamic panel data models have been implemented in the STATA package \code{xtabond2} by Roodman (2009) and some of the features are also available in the R package \pkg{plm}.
-#' 
+#'
 #' For more technical details on the estimation, please refer to our working paper Sigmund and Ferstl (2017).
-#' 
+#'
 #' There we define the first difference moment conditions (see Holtz-Eakin et al., 1988; Arellano and Bond, 1991), formalize the ideas to reduce the number of moment conditions by linear transformations of the instrument matrix and define the one- and two-step GMM estimator. Furthermore, we setup the system moment conditions as defined in Blundell and Bond (1998) and present the extended GMM estimator. In addition to the GMM-estimators we contribute to the literature by providing specification tests (Hansen overidentification test, lag selection criterion and stability test of the PVAR polynomial) and classical structural analysis for PVAR models such as orthogonal and generalized impulse response functions, bootstrapped confidence intervals for impulse response analysis and forecast error variance decompositions. Finally, we implement the first difference and the forward orthogonal transformation to remove the fixed effects.
-#' 
+#'
 #' @references
 #' Arellano, M., Bond, S. (1991) Some Tests of Specification for Panel Sata: Monte Carlo Evidence and an Application to Employment Equations \emph{The Review of Economic Studies}, \bold{58}(2), 277--297, \doi{10.2307/2297968}
 #'
@@ -59,19 +59,19 @@
 #' Holtz-Eakin D., Newey W., Rosen H.S. (1988) Estimating Vector Autoregressions with Panel Data, \emph{Econometrica}, \bold{56}(6), 1371--1395, \doi{10.2307/1913103}
 #'
 #' Roodman, D. (2009) How to Do xtabond2: An Introduction to Difference and System GMM in Stata \emph{The Stata Journal}, \bold{9}(1), 86--136, \url{https://www.stata-journal.com/article.html?article=st0159}
-#' 
+#'
 #' Sigmund, M., Ferstl, R. (2017) Panel Vector Autoregression in R with the Package panelvar \emph{Available at SSRN:} \url{https://www.ssrn.com/abstract=2896087}
 #' \doi{10.2139/ssrn.2896087}
-#' 
+#'
 #' @seealso
 #' \code{\link{stability}} for stability tests
-#' 
+#'
 #' \code{\link{oirf}} and \code{\link{girf}} for orthogonal and generalized impulse response functions (including bootstrapped confidence intervals)
-#' 
+#'
 #' \code{\link{coef.pvargmm}}, \code{\link{se}}, \code{\link{pvalue}}, \code{\link{fixedeffects}} for extrator functions for the most important results
-#' 
+#'
 #' \code{\link{fevd_orthogonal}} for forecast error variance decomposition
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(panelvar)
@@ -95,7 +95,7 @@
 #' }
 #' data("ex3_abdata")
 #' summary(ex3_abdata)
-#' 
+#'
 #' data("Dahlberg")
 #' \dontrun{
 #' ex1_dahlberg_data <- pvargmm(dependent_vars = c("expenditures", "revenues", "grants"),
@@ -236,16 +236,16 @@ pvargmm <-
                           SIMPLIFY = FALSE
                         )
                       ))
-    
-    # Build stats here: 
+
+    # Build stats here:
     # Descriptive statistics --------------------------------------------------
     nof_observations <- dim(na.exclude(Set_Vars))[1]
     data_panel_identifier <- data[panel_identifier]
-    
+
     obs_per_group_avg <- mean(table(factor(na.exclude(Set_Vars)$category)), na.rm = TRUE)
     obs_per_group_min <- min(table(factor(na.exclude(Set_Vars)$category)), na.rm = TRUE)
     obs_per_group_max <- max(table(factor(na.exclude(Set_Vars)$category)), na.rm = TRUE)
-    
+
     nof_groups <- length(unique(data_panel_identifier[,1]))
     # -------------------------------------------------------------------------
 
@@ -298,8 +298,8 @@ pvargmm <-
       }
     }
 
-    
-    
+
+
     # Onestep estimation (initialization) ------------------------------------
 
     # initalize Q_i matrix (see Binder eq 6.2)
@@ -365,7 +365,7 @@ pvargmm <-
 
     position_exogenous <- ncol(Endo_Transition_Lmin_Lmax) + 1
     if(!missing(predet_vars)){position_exogenous <- position_exogenous +ncol(Predetermined_Transition_Lmin_Lmax)}
-    
+
     # Begin onestep computation loop -----------------------------------------
     # Output: Q, delta.W, delta_W_minus
 
@@ -820,12 +820,13 @@ pvargmm <-
       pb$tick()
     }
 
-    S_ZX_a <- mapply(function(i) Matrix(Q[[i]] %*% delta_W_minus[[i]], sparse = TRUE), 1:nof_categories)
+    S_ZX_a <- mapply(function(i) Matrix(mmult(as.matrix(Q[[i]]),as.matrix(delta_W_minus[[i]])), sparse = TRUE), 1:nof_categories)
     sum_S_ZX_a <-Reduce('+', S_ZX_a)
 
-    sum_S_Zy_a <-Reduce('+', mapply(function(i) Matrix( Q[[i]]%*%delta_W[[i]], sparse = TRUE), 1:nof_categories, SIMPLIFY = FALSE))
+    sum_S_Zy_a <-Reduce('+', mapply(function(i) Matrix( mmult(as.matrix(Q[[i]]), as.matrix(delta_W[[i]])), sparse = TRUE), 1:nof_categories, SIMPLIFY = FALSE))
 
-    sum_Lambda <- Reduce('+', mapply(function(i) Matrix(   Q[[i]] %*%V %*% t(V) %*% t(Q[[i]]), sparse = TRUE), 1:nof_categories, SIMPLIFY = FALSE))
+    sum_Lambda <- Reduce('+', mapply(function(i) Matrix(mmult(mmult(as.matrix(Q[[i]]), as.matrix(V)),
+                                                              mmult(as.matrix(t(V)), as.matrix(t(Q[[i]])))), sparse = TRUE), 1:nof_categories, SIMPLIFY = FALSE))
 
     #sum_Lambda_vec <- sum_Lambda %x% diag(1,nof_dependent_vars)
     sum_Lambda_vec <- sum_Lambda %x% Diagonal(nof_dependent_vars)
@@ -842,10 +843,10 @@ pvargmm <-
 
     # Estimate Vec-Form of Phi_first_step
     inv.Phi_firststep <- MASS::ginv( as.matrix( t(sum_S_ZX_a %x% Diagonal(nof_dependent_vars)) %*% Lambda_inv_vec %*% (sum_S_ZX_a %x% Diagonal(nof_dependent_vars)) ))
-    
+
     Phi_first_step_vec <- inv.Phi_firststep %*% t(sum_S_ZX_a %x% Diagonal(nof_dependent_vars)) %*% Lambda_inv_vec %*% matrix(t(sum_S_Zy_a), ncol=1)
-    
-    
+
+
 
     Phi_first_step <- matrix(Phi_first_step_vec,ncol=nof_dependent_vars*lags+nof_predet_vars+nof_exog_vars+
                                (system_instruments == TRUE)*(system_constant == TRUE)*1)
@@ -858,7 +859,7 @@ pvargmm <-
 
     Delta_E_first_step <- mapply(function(i) delta_W[[i]] - delta_W_minus[[i]] %*% t(Phi_first_step), 1:nof_categories)
     Delta_E_first_step_NA <- mapply(function(i) delta_W_NA[[i]] - delta_W_minus_NA[[i]] %*% t(Phi_first_step), 1:nof_categories)
-    
+
     # vectorize residuals
     e_hat <- mapply(function(i) matrix(t(Delta_E_first_step[[i]]), ncol=1), 1:nof_categories, SIMPLIFY = FALSE)
 
@@ -1127,7 +1128,7 @@ pvargmm <-
     if (steps == "mstep"){
 
       result <- list(Phi_first_step, Phi_mstep[[m]], se_first_step, se_mstep, p_values_first_step, p_values_mstep,
-                     Delta_E_mstep_NA, Delta_E_mstep,  S_EQ_mstep, Lambda_inv_vec,  D_e.inv, Q, Z, delta_W, 
+                     Delta_E_mstep_NA, Delta_E_mstep,  S_EQ_mstep, Lambda_inv_vec,  D_e.inv, Q, Z, delta_W,
                      delta_W_minus
       )
       names(result) <- c("first_step", "m_step", "standard_error_first_step", "standard_error_m_step", "p_values_first_step", "p_values_m_step",
